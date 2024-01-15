@@ -5,7 +5,7 @@ import React from "react";
 function Content({ items, handleCheck, handleDelete }) {
 
  return (
-    <div className="text-2xl">
+    <>
       {items.length ? (
         <ItemList 
         items={items}
@@ -16,7 +16,7 @@ function Content({ items, handleCheck, handleDelete }) {
         ) : (
           <p className="text-4xl font-bold text-center mt-60">Your list is empty</p>
         )}
-    </div>
+    </>
   );
 }
 

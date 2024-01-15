@@ -7,21 +7,50 @@ import { useEffect, useState } from "react";
 import AddItem from "./components/AddItem";
 import ItemList from "./components/ItemList";
 import SearchItem from "./components/SearchItem";
+import apiRequest from "./apiRequest";
 
 function App() {
-  const [items, setItems] = useState(
-    JSON.parse(localStorage.getItem("shoppingList"))
-  );
+  const API_URL = 'http://localhost:3500/items';
+
+  // const [info, setInfo] =useState([])
+
+  const [items, setItems] = useState([]);
 
   const [newItem, setNewItem] = useState("");
-  // container for the input
+  // container for  the input
 
   const [search, setSearch] = useState("");
   //☝ input for search
 
+  const [fetchError, setFetchError] =useState(null);
+  //☝ this is for error handling
+
+  const [isLoading, setIsloading] =useState(true);
+  //for the loading message / spinner
+
   useEffect(()=> {
-    console.log('render')
-  }, [])
+    const fetchItems = async () => {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw Error('Did not recieve expected data') //if res is not ok  throw this error
+        const listItems = await res.json();
+        setItems(listItems);
+        setFetchError(null); //making sure this remains null if there is no error
+      } catch (err) {
+        setFetchError(err.message)//passing the err message into state
+      } finally {
+        setIsloading(false); //set to false whether the outcome is error or not
+      }
+    }
+
+    (async () => await fetchItems())(); //check this line on chatgpt.. also simple fetchItems() can be used here
+  }, []);
+  // 👇inplementing the loading message/spinner
+  // {isLoading &&  <p>Loading...</p> }
+  // 👇inplementing the error message
+  // {fetchError && <p className="text-red-500">{`Error: ${fetchError}`}</p>}
+  //Note: try runs for the resolve, catch for reject and finally runs either way
+  
 
   function setAndSaveItems(newItems) {
     setItems(newItems);
@@ -34,6 +63,10 @@ function App() {
     const myNewItem = { id, checked: false, item };
     const listItems = [...items, myNewItem];
     setAndSaveItems(listItems);
+
+    const postOptions = {
+      m
+    }
   };
   // ☝ recives a parameter
   // first line basically just gets the id of the last item in the list and increments it by one (+1) for the new item coming in
@@ -76,15 +109,21 @@ function App() {
         handleSubmit={handleSubmit}
       />
       <SearchItem search={search} setSearch={setSearch} />
-      <Content
-        items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
-        // ☝this line filters the items according to what is typed inisde the search input which it converts lowercase ????
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+
+      <main className="text-2xl">
+        {isLoading &&  <p>Loading...</p> }
+        {fetchError && <p className="text-red-500">{`Error: ${fetchError}`}</p>}
+        {!fetchError && !isLoading && <Content //👈if there is no error & no loading display these👇. This makes sure that the "empty list" message is not displayed..
+          items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
+          // ☝this line filters the items according to what is typed inisde the search input which it converts lowercase ????
+          handleCheck={handleCheck}
+          handleDelete={handleDelete}
+        />}
+      </main>
       <Footer lenght={items.length} />
     </section>
   );
 }
 
 export default App;
+//Note I am using the main tag on Content component because I want to do that error thing(expression) there. So instead of having the main tag in the component itself I used a fragment.
