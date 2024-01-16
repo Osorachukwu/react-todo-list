@@ -1,24 +1,29 @@
 {
-    "items": [
-        {
-            "id": 1,
-            "checked": false,
-            "item": "Almond, Unsalted, in blue bag"
-        },
-        {
-            "id": 2,
-            "checked": false,
-            "item": "Pizza"
-        },
-        {
-            "id": 3,
-            "checked": false,
-            "item": "Bread"
-        },
-        {
-            "id": 4,
-            "checked": false,
-            "item": "Akara"
-        }
-    ]
+  "items": [
+    {
+      "id": "3",
+      "checked": false,
+      "item": "Bread"
+    },
+    {
+      "id": "4",
+      "checked": false,
+      "item": "Akara"
+    },
+    {
+      "id": "41",
+      "checked": false,
+      "item": "MOI-MOI"
+    },
+    {
+      "id": "411",
+      "checked": false,
+      "item": "banana"
+    },
+    {
+      "id": "4111",
+      "checked": false,
+      "item": "cashew"
+    }
+  ]
 }

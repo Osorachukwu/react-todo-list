@@ -8,6 +8,7 @@ import AddItem from "./components/AddItem";
 import ItemList from "./components/ItemList";
 import SearchItem from "./components/SearchItem";
 import apiRequest from "./apiRequest";
+import { stringify } from "postcss";
 
 function App() {
   const API_URL = 'http://localhost:3500/items';
@@ -58,37 +59,61 @@ function App() {
   }
   // local storage function💥
 
-  const addItem = (item) => {
+  const addItem = async (item) => {
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id, checked: false, item };
     const listItems = [...items, myNewItem];
     setAndSaveItems(listItems);
 
+    //👇Handling the the post(to put items into the server) in the server💾
     const postOptions = {
-      m
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(myNewItem)
     }
+    const result = await apiRequest(API_URL, postOptions);
+    if (result) setFetchError(result)
   };
   // ☝ recives a parameter
   // first line basically just gets the id of the last item in the list and increments it by one (+1) for the new item coming in
   // second line myNewItem gets that new incremented id and checked property of false (intialy) and also the item created newly
   // Thrid line creates a new array to update the items state with,  by spreading it alongside myNewItem
 
-  function handleCheck(id) {
+  const handleCheck = async (id) => {
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
     setItems(listItems);
-    setAndSaveItems(listItems);
+
+    //👇Handling the the checked in the server💾
+    const myItem = listItems.filter((item)=> item.id === id);
+    const updateOptions = {
+      method: 'PATCH',
+      headers: {
+        'COntent-Type': 'application/json'
+      },
+      body: JSON.stringify({ checked: myItem[0].checked })
+    };
+    const reqUrl = `${API_URL}/${id}`;
+    const result = await apiRequest(reqUrl, updateOptions);
+    if (result) setFetchError(result);
   }
   // ☝basically we create a new array by mapping through the items state, then check through the items to see which has an equivalent id to the one we have recived from the onChange(the function parameter-id). Then spread that curr ent item and access the checked property(status) and make it the oposite of what it currently is, but if not simply return the item the way it is..
   // Finally use setItems to update the items array to listItems
 
-  function handleDelete(id) {
+  const handleDelete = async (id) => {
     const listItems = items.filter((items) => items.id !== id);
     setItems(listItems);
-    setAndSaveItems(listItems);
+
+    //👇Handling the the delete in the server💾
+    const deleteOptions = { method: 'DELETE'};
+    const reqUrl = `${API_URL}/${id}`;
+    const result = await apiRequest(reqUrl, deleteOptions);
+    if (result) setFetchError(result);
   }
-  // Using sort method to delete an item
+  
 
   function handleSubmit(e) {
     e.preventDefault();
